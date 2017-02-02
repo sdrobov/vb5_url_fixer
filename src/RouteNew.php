@@ -4,9 +4,8 @@ namespace Vb5UrlFixer;
 
 class RouteNew extends BaseModel
 {
-    public function __construct($data, $prefix = null)
+    public function __construct($data)
     {
-        $this->tableName = 'routenew';
-        parent::__construct($data, $prefix);
+        parent::__construct($data);
     }
 }

@@ -4,9 +4,8 @@ namespace Vb5UrlFixer;
 
 class Node extends BaseModel
 {
-    public function __construct($data, $prefix = null)
+    public function __construct($data)
     {
-        $this->tableName = 'node';
-        parent::__construct($data, $prefix);
+        parent::__construct($data);
     }
 }
