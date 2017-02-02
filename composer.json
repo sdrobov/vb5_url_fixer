@@ -1,0 +1,15 @@
+{
+    "name": "sdrobov/vb5_url_fixer",
+    "description": "Fixes vb5 cyrillic url after migrating from vb4",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Sergey Drobov",
+            "email": "serch.m@gmail.com"
+        }
+    ],
+    "require": {},
+	"autoload": {
+		"psr-4": { "Vb5UrlFixer\\": "src/" }
+	}
+}
