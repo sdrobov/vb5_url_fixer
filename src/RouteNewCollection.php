@@ -28,6 +28,33 @@ class RouteNewCollection extends BaseCollection
     }
 
     /**
+     * @param int $id
+     * @return RouteNew
+     */
+    public function getByPk($id)
+    {
+        return parent::getByPk($id);
+    }
+
+    /**
+     * @param array $params
+     * @return RouteNew
+     */
+    public function getOne($params = [])
+    {
+        return parent::getOne($params);
+    }
+
+    /**
+     * @param BaseModel $model
+     * @return RouteNew
+     */
+    public function save(BaseModel $model)
+    {
+        return parent::save($model);
+    }
+
+    /**
      * @param array $data
      * @return RouteNew
      */

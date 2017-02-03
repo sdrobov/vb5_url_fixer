@@ -28,6 +28,33 @@ class NodeCollection extends BaseCollection
     }
 
     /**
+     * @param int $id
+     * @return Node
+     */
+    public function getByPk($id)
+    {
+        return parent::getByPk($id);
+    }
+
+    /**
+     * @param array $params
+     * @return Node
+     */
+    public function getOne($params = [])
+    {
+        return parent::getOne($params);
+    }
+
+    /**
+     * @param BaseModel $model
+     * @return Node
+     */
+    public function save(BaseModel $model)
+    {
+        return parent::save($model);
+    }
+
+    /**
      * @param array $data
      * @return Node
      */

@@ -26,7 +26,7 @@ class Db
     public static function getInstance($tablePrefix = null)
     {
         if (!static::$instance) {
-            static::$instance = new static();
+            static::$instance = new static($tablePrefix);
         }
 
         return static::$instance;
@@ -51,14 +51,18 @@ class Db
     }
 
     /**
-     * @param string $sql
+     * @param string $query
+     * @param array $params
      * @return \PDOStatement
      */
-    public function query($sql)
+    public function query($query, $params = [])
     {
         $this->assertConnection();
 
-        return $this->pdo->query($sql);
+        $statement = $this->pdo->prepare($query);
+        $statement->execute($params ?: null);
+
+        return $statement;
     }
 
     /**
