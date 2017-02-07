@@ -20,13 +20,19 @@ class Db
     protected $tablePrefix;
 
     /**
+     * @var bool
+     */
+    protected $dryUpdate;
+
+    /**
      * @param string $tablePrefix
+     * @param bool $dryUpdate
      * @return Db
      */
-    public static function getInstance($tablePrefix = null)
+    public static function getInstance($tablePrefix = null, $dryUpdate = true)
     {
         if (!static::$instance) {
-            static::$instance = new static($tablePrefix);
+            static::$instance = new static($tablePrefix, $dryUpdate);
         }
 
         return static::$instance;
@@ -58,6 +64,16 @@ class Db
     public function query($query, $params = [])
     {
         $this->assertConnection();
+        if ($this->dryUpdate && strpos($query, 'UPDATE') === 0) {
+            $keys = array_keys($params);
+            $values = array_map(function($value) {
+                return is_numeric($value) ? $value : "'{$value}'";
+            }, array_values($params));
+
+            echo str_replace($keys, $values, $query) . PHP_EOL;
+
+            return null;
+        }
 
         $statement = $this->pdo->prepare($query);
         $statement->execute($params ?: null);
@@ -113,9 +129,16 @@ class Db
         }
     }
 
-    protected function __construct($tablePrefix = null)
+    /**
+     * Db constructor.
+     *
+     * @param string $tablePrefix
+     * @param bool $dryUpdate
+     */
+    protected function __construct($tablePrefix = null, $dryUpdate = true)
     {
         $this->tablePrefix = $tablePrefix;
+        $this->dryUpdate = $dryUpdate;
     }
 
     protected function __clone()

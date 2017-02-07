@@ -63,4 +63,52 @@ class Node extends BaseModel
     {
         parent::__construct($data);
     }
+
+    /**
+     * @return bool
+     */
+    public function hasParent()
+    {
+        return (bool)$this->parentid;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasChildren()
+    {
+        return $this->getChildren() > 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasRoute()
+    {
+        return (bool)$this->routeid;
+    }
+
+    /**
+     * @return Node
+     */
+    public function getParent()
+    {
+        return NodeCollection::me()->getByPk($this->parentid);
+    }
+
+    /**
+     * @return Node[]
+     */
+    public function getChildren()
+    {
+        return NodeCollection::me()->where(['parentid' => $this->nodeid]);
+    }
+
+    /**
+     * @return RouteNew
+     */
+    public function getRoute()
+    {
+        return RouteNewCollection::me()->getByPk($this->routeid);
+    }
 }

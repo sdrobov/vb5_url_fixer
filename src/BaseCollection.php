@@ -2,7 +2,7 @@
 
 namespace Vb5UrlFixer;
 
-abstract class BaseCollection implements \Iterator
+abstract class BaseCollection implements \Iterator, \Countable
 {
     /**
      * @var string
@@ -117,6 +117,18 @@ abstract class BaseCollection implements \Iterator
         return $model->updateChangedData();
     }
 
+    /**
+     * @return int
+     */
+    public function count()
+    {
+        if (!$this->total) {
+            $this->rewind();
+        }
+
+        return $this->total;
+    }
+
     public function current()
     {
         return $this->currentModel;
@@ -189,8 +201,12 @@ abstract class BaseCollection implements \Iterator
                 list($operator, $value) = $value;
             }
 
-            $whereArr[] = "{$key} {$operator} :{$keyPrefix}{$key}";
-            $whereParams[":{$keyPrefix}{$key}"] = $value;
+            if ($operator == 'IS') {
+                $whereArr[] = "{$key} {$operator} {$value}";
+            } else {
+                $whereArr[] = "{$key} {$operator} :{$keyPrefix}{$key}";
+                $whereParams[":{$keyPrefix}{$key}"] = $value;
+            }
         }
 
         $whereString = ' WHERE ' . implode(' AND ', $whereArr);
