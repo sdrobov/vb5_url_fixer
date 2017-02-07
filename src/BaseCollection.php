@@ -198,7 +198,8 @@ abstract class BaseCollection implements \Iterator, \Countable
         foreach ($where as $key => $value) {
             $operator = '=';
             if (is_array($value)) {
-                list($operator, $value) = $value;
+                list($operator, $v) = $value;
+                $value = $v;
             }
 
             if ($operator == 'IS') {
