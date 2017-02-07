@@ -153,7 +153,7 @@ abstract class BaseCollection implements \Iterator, \Countable
      */
     public function valid()
     {
-        return $this->currentOffset + 1 < $this->total;
+        return $this->currentOffset + 1 < $this->total && $this->currentModel;
     }
 
     public function rewind()
@@ -178,7 +178,11 @@ abstract class BaseCollection implements \Iterator, \Countable
     protected function fetch()
     {
         $query = "SELECT * FROM {$this->getTableName()} {$this->where} LIMIT 1 OFFSET {$this->currentOffset}";
-        $this->currentModel = $this->createModel(Db::getInstance()->query($query, $this->whereParams)->fetch());
+        if ($data = Db::getInstance()->query($query, $this->whereParams)->fetch()) {
+            $this->currentModel = $this->createModel($data);
+        } else {
+            $this->currentModel = null;
+        }
     }
 
     protected function parseWhere($where = null, $returnOnly = false, $keyPrefix = '')
