@@ -9,6 +9,7 @@ $options = [
     'table_prefix' => '',
     'host' => 'localhost',
     'dry' => true,
+    'log_queries' => true,
 ];
 
 $fixer = new \Vb5UrlFixer\Fixer(
@@ -17,6 +18,7 @@ $fixer = new \Vb5UrlFixer\Fixer(
     $options['dbname'],
     $options['table_prefix'],
     $options['host'],
-    $options['dry']
+    $options['dry'],
+    $options['log_queries']
 );
 $fixer->fix();

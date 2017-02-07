@@ -13,10 +13,20 @@ class Fixer
      * @param string $dbTablePrefix
      * @param string $dbHost
      * @param bool $dry
+     * @param bool $logQueries
+     * @throws \Exception
      */
-    public function __construct($dbUserName, $dbPassword, $dbName, $dbTablePrefix = '', $dbHost = 'localhost', $dry = true)
+    public function __construct(
+        $dbUserName,
+        $dbPassword,
+        $dbName,
+        $dbTablePrefix = '',
+        $dbHost = 'localhost',
+        $dry = true,
+        $logQueries = false
+    )
     {
-        if (!Db::getInstance($dbTablePrefix, $dry)->connect($dbHost, $dbName, $dbUserName, $dbPassword)) {
+        if (!Db::getInstance($dbTablePrefix, $dry, $logQueries)->connect($dbHost, $dbName, $dbUserName, $dbPassword)) {
             throw new \Exception('Cant connect to db!');
         }
     }
