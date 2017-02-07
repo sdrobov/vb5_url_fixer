@@ -33,7 +33,7 @@ class Fixer
 
     public function fix()
     {
-        $nodes = NodeCollection::me()->where(['parentid' => ['IS', 'NULL']]);
+        $nodes = NodeCollection::me();
 
         Db::getInstance()->begin();
         foreach ($nodes as $node) {
