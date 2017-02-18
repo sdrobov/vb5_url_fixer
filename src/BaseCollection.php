@@ -90,7 +90,11 @@ abstract class BaseCollection implements \Iterator, \Countable
         list($whereString, $whereParams) = $this->parseWhere([$this->pkName => $id], true);
         $query = "SELECT * FROM {$this->getTableName()} {$whereString}";
 
-        return $this->createModel(Db::getInstance()->query($query, $whereParams)->fetch());
+        if ($data = Db::getInstance()->query($query, $whereParams)->fetch()) {
+            return $this->createModel($data);
+        }
+
+        return $this->createModel([]);
     }
 
     public function getOne($params = [])
@@ -98,7 +102,11 @@ abstract class BaseCollection implements \Iterator, \Countable
         list($where, $whereParams) = $this->parseWhere($params, true);
         $query = "SELECT * FROM {$this->getTableName()} {$where} LIMIT 1 OFFSET 0";
 
-        return $this->createModel(Db::getInstance()->query($query, $whereParams)->fetch());
+        if ($data = Db::getInstance()->query($query, $whereParams)->fetch()) {
+            return $this->createModel($data);
+        }
+
+        return $this->createModel([]);
     }
 
     public function save(BaseModel $model)

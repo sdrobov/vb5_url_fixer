@@ -4,6 +4,9 @@ namespace Vb5UrlFixer;
 
 class Fixer
 {
+    protected $nodes = [];
+    protected $routes = [];
+
     /**
      * Fixer constructor.
      *
@@ -35,9 +38,24 @@ class Fixer
     {
         $nodes = NodeCollection::me();
 
-        Db::getInstance()->begin();
         foreach ($nodes as $node) {
             $this->fixNode($node);
+        }
+
+        Db::getInstance()->begin();
+        foreach ($this->nodes as $nodeId => $newUrlident) {
+            $node = NodeCollection::me()->getByPk($nodeId);
+            $node->urlident = $newUrlident;
+
+            NodeCollection::me()->save($node);
+        }
+        foreach ($this->routes as $routeId => $newValues) {
+            list($newPrefix, $newRegex) = [$newValues['prefix'], $newValues['regex']];
+            $route = RouteNewCollection::me()->getByPk($routeId);
+            $route->prefix = $newPrefix;
+            $route->regex = $newRegex;
+
+            RouteNewCollection::me()->save($route);
         }
         Db::getInstance()->commit();
     }
@@ -47,15 +65,26 @@ class Fixer
      */
     protected function fixNode(Node $node)
     {
+        if ($node->isEmpty()) {
+            return;
+        }
+
+        if (!mb_ereg_match('.*[а-яА-Я].*', $node->title)) {
+            return;
+        }
+
+        if (isset($this->nodes[$node->nodeid])) {
+            return;
+        }
+
         $newUrlident = mb_strtolower($node->title);
         $newUrlident = str_replace(' ', '-', $newUrlident);
         $newUrlident = mb_ereg_replace('[^\w\d\-]', '', $newUrlident);
 
+        $this->nodes[$node->nodeid] = $newUrlident;
+
         $this->fixRoute($node, $newUrlident);
         $this->fixChildRoutes($node, $newUrlident);
-
-        $node->urlident = $newUrlident;
-        NodeCollection::me()->save($node);
     }
 
     /**
@@ -65,15 +94,31 @@ class Fixer
      */
     protected function fixRoute(Node $node, $newUrlident, $customUrlident = null)
     {
+        if ($node->isEmpty()) {
+            return;
+        }
+
         if (!$node->hasRoute()) {
             return;
         }
 
-        $route = $node->getRoute();
-        $route->prefix = str_replace($customUrlident ?: $node->urlident, $newUrlident, $route->prefix);
-        $route->regex = str_replace($customUrlident ?: $node->urlident, $newUrlident, $route->regex);
+        $prefix = '';
+        $regex = '';
+        if (isset($this->routes[$node->routeid])) {
+            list($prefix, $regex) = [$this->routes[$node->routeid]['prefix'], $this->routes[$node->routeid]['regex']];
+        } else {
+            $route = $node->getRoute();
+            if ($route->isEmpty()) {
+                return;
+            }
 
-        RouteNewCollection::me()->save($route);
+            list($prefix, $regex) = [$route->prefix, $route->regex];
+        }
+
+        $prefix = str_replace($customUrlident ?: $node->urlident, $newUrlident, $prefix);
+        $regex = str_replace($customUrlident ?: $node->urlident, $newUrlident, $regex);
+
+        $this->routes[$node->routeid] = ['prefix' => $prefix, 'regex' => $regex];
     }
 
     /**
